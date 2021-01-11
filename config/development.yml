@@ -1,0 +1,13 @@
+db:
+    host: '127.0.0.1'
+    username: 'root'
+    password: 'password'
+
+jwt:
+    expiresIn: 7d
+    session: false
+    jwtSecret: '@JSON-WEB-TOKEN@1MFEUEJV8v38qjg-faegn3uaghnanrna-caenegnaueigne-cnaeuavawnfuoegvn?d=12/12/2020&t=21:05&tkn=mfisen@jisg-naebve8cbo3-dvnunvsoe4'
+
+db_sync:
+    alter: true
+    force: false

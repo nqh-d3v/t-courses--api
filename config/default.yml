@@ -1,0 +1,30 @@
+server:
+    port: 3000
+
+db:
+    database: 't_courses'
+    port: 3306
+
+jwt:
+    expiresIn: 7d
+    session: false
+    jwtSecret: '@JSON-WEB-TOKEN@1MFEUEJV8v38qjg-faegn3uaghnanrna-caenegnaueigne-cnaeuavawnfuoegvn?d=12/12/2020&t=21:05&tkn=mfisen@jisg-naebve8cbo3-dvnunvsoe4'
+
+session:
+    name: 'session'
+    proxy: true
+    resave: true
+    saveUninitialized: true
+    cookie:
+        secure: false
+    secret: '@SESSION@DSJVISJG9Emvidngi=dvmioevnsovn rio-sdnvsrnvvnrovr?d=12/12/2020&t=21:05&srt=cmio93dc@weciotgf-efnf4owgvw8ogj48hng-DVNjfOGJW4JWIEGJO'
+
+static:
+    maxAge: '30 days'
+    dotfiles: 'allow'
+
+cors:
+    origin:
+        - 'http://localhost:3000'
+        - 'http://localhost:3001'
+        - 'http://localhost:3002'

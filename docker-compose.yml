@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+    app:
+        container_name: oep-api
+        image: oep-be:latest
+        build:
+          context: .
+          dockerfile: Dockerfile.dev
+        restart: on-failure
+        volumes:
+            - ./src:/app/src
+            - ./bin:/app/bin
+            - ./config:/app/config
+            - ./docs:/app/docs
+            - ./app.js:/app/app.js
+            - ./package.json:/app/package.json
+            - ./.env:/app/.env
+        ports:
+            - ${APP_PORT}:3000
+        environment:
+            - ./.env
+            - CHOKIDAR_USEPOLLING=true
+        depends_on:
+            - db
+
+    db:
+      image: mysql:8
+      command: --default-authentication-plugin=mysql_native_password
+      restart: always
+      volumes:
+        - ./mysql:/var/lib/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${DB_NAME}
+        MYSQL_USER: ${DB_USERNAME}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+        - ${ADMINER_PORT}:8080
