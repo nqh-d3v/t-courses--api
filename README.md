@@ -33,10 +33,10 @@ This repo is backend code ( i will use expressJS, it is a framework for NodeJS i
       COURSE_KEY_SECRET=your_key_secret_for_course
       COURSE_IV_SECRET=your_iv_secret_for_course
 
-      EMAIL_HST=email_hosting_domain
-      EMAIL_PRT=email_hosting_port
-      EMAIL_USR=email_hosting_username
-      EMAIL_PWD=email_hosting_password
+      EMAIL_HST=your_email_hosting_domain
+      EMAIL_PRT=your_email_hosting_port
+      EMAIL_USR=your_email_hosting_username
+      EMAIL_PWD=your_email_hosting_password
     ```
     By default, your app will be run on port '3000' and connect to database with name is '*your_database_name*'.
 
@@ -46,6 +46,7 @@ This repo is backend code ( i will use expressJS, it is a framework for NodeJS i
 > List of modules for this project
 - Auth ( for authenticate anyone ).
 - Courses ( will be created by admin of system, mentor or anyone with role is admin ).
+- Cart ( for buy courses and payment ). 
 - Admins ( who have all permissions in system ).
 - Mentors ( who login to system with account was created by admin, they can create course and manage their course,... ).
 - Users ( who create accounts, authenticate and study in system ).
