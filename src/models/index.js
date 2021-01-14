@@ -55,9 +55,11 @@ db.Sequelize = Sequelize;
 
 (async function seeders() {
     try {
-        await db.admin.create({
-            username: process.env.ADMIN_USR || 'admin',
-            password: process.env.ADMIN_PWD || '@V3ryStR0N9P@asSWorD@V3ryStR0N9P@asSWorD',
+        await db.account.create({
+            username: process.env.ADMIN_USR || 'admin_00',
+            password: process.env.ADMIN_PWD || 'password_for_admin_00',
+            name: 'admin_default',
+            isActive: true,
             role: 'admin'
         });
 

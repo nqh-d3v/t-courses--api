@@ -12,21 +12,12 @@ const params = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 
-function validateEmail(email) {
-    // eslint-disable-next-line no-useless-escape
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-}
-
 module.exports = function () {
 
     // For ALL ==================================
     const strategyJWT = new StrategyJWT(params, async (payload, done) => {
         try {
-            const dataToken = payload.sub.split('!@#$%^&*()-=1234567890-=');
-            const info = validateEmail(dataToken[1])
-                ? await models.user.findByPk(dataToken[0])
-                : await models.admin.findByPk(dataToken[0]);
+            const info = await models.account.findByPk(payload.sub.split('@~@')[0]);
             
             if (info) {
                 return done(null, {
@@ -53,7 +44,6 @@ module.exports = function () {
         authenticateJWT: function (req, res, next) {
             return passport.authenticate(
                 'jwt',
-                // config.session,
                 (err, user, info) => {
                     if (err) {
                         return next(err);
@@ -67,10 +57,17 @@ module.exports = function () {
                             ),
                         );
                     }
-                    if (user.role === 'user' && !user.isActive) {
+                    if (!user.isActive) {
+                        throw new AppError(
+                            httpStatus.METHOD_NOT_ALLOWED,
+                            'This account hasn’t been activated yet.',
+                            true,
+                        );
+                    }
+                    if (user.isLock) {
                         throw new AppError(
                             httpStatus.FORBIDDEN,
-                            'This account hasn’t been activated yet.',
+                            'This account has been locked yet.',
                             true,
                         );
                     }

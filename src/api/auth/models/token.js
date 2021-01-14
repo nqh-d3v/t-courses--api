@@ -6,18 +6,18 @@ module.exports = (sequelize, Sequelize) => {
 
 	Token.init(
 		{
-			name: {
+			purpose: {
         type: Sequelize.ENUM('active-account', 'login-account'),
         defaultValue: 'active-account',
       },
       userId: {
         type: Sequelize.STRING(255),
         allowNull: false,
-      },
-		},
+			},
+		}, 
 		{
 			sequelize,
-			modelName: 'token_auth',
+			modelName: 'auth_token',
 			timestamps: true,
 			underscored: true,
 		},
@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
 	*/
 
 	Token.associate = function (models) {
-    Token.hasOne(models.user, {
+    Token.hasOne(models.account, {
         foreignKey: 'user_id',
         as: 'tokenauth_user',
         onDelete: 'CASCADE',

@@ -8,20 +8,33 @@ const authKeySecret = process.env.AUTH_KEY_SECRET || 'c8c27795ca5ffac0c863a407d5
 
 module.exports = {
     // --- for AUTHENTICATE
-    loginLocal: async function(credentials, role) {
-        const info = role === 'user'
-            ? await models.user.validateAccountCredentials(credentials)
-            : await models.admin.validateAccountCredentials(credentials);
+    validLocal: async function(credentials) {
+        const info = await models.account.validateAccountCredentials(credentials);
         if (!info) {
             throw new AppError(
                 httpStatus.UNAUTHORIZED,
-                'Invalid Credentials.',
+                'Username or password is incorrect',
                 true,
             );
         }
-
+        // if account is inactive
+        if ( !info.isActive ) {
+            throw new AppError(
+                httpStatus.METHOD_NOT_ALLOWED,
+                'Account is inactive',
+                true,
+            );
+        }
+        // if account is locked
+        if ( info.isLock) {
+            throw new AppError(
+                httpStatus.FORBIDDEN,
+                'Account is locked',
+                true,
+            );
+        }
         return {
-            user: {
+            account: {
                 id: info.id,
                 username: info.username,
                 role: info.role,

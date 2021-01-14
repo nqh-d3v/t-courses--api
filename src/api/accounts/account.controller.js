@@ -1,4 +1,4 @@
-const userSrv = require('./user.service');
+const userSrv = require('./account.service');
 
 module.exports = {
   getUser: async function (req, res, next) {
