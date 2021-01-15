@@ -1,34 +1,34 @@
 /* eslint-disable camelcase */
 const models = require('../../models');
+const { Op } = require("sequelize");
+
 const AppError = require('../../common/error/error');
 const { httpStatus } = require('../../common/error/http-status');
 
 module.exports = {
 	create: async function (profile) {
-		const check = await models.user.findOne({ where: { username: profile.username }});
+		const { username, password, name, email } = profile;
+		const check = await models.account.findOne({
+			where: {[Op.or] : [{ username }, { email }]}
+		});
 		if (check) {
 			throw new AppError(
 				httpStatus.CONFLICT,
-				'Tên đăng nhập đã được sử dụng',
+				'Username or email already used',
 				true,
 			);
 		}
-		const newUser = await models.user.create({
-			username: profile.username,
-			password: profile.password,
-			name: profile.name,
-			role: 'user',
-		});
+		const newUser = await models.account.create({ username, password, name, email });
 
 		delete newUser.dataValues.password;
 		return newUser;
 	},
 	getAllUser: async function () {
-		const all = await models.user.findAll();
+		const all = await models.account.findAll();
 		return all;
 	},
 	getUserById: async function (id) {
-		const info = await models.user.findOne({where: { id, isLock: false }});
+		const info = await models.account.findOne({where: { id, isLock: false }});
 		if (!info) {
 			throw new AppError(
 				httpStatus.NOT_FOUND,
@@ -40,7 +40,7 @@ module.exports = {
 		return info;
 	},
 	getUserByUsername: async function (username) {
-		const info = await models.user.findOne({where: { username, isLock: false }});
+		const info = await models.account.findOne({where: { username, isLock: false }});
 		if (!info) {
 			throw new AppError(
 				httpStatus.NOT_FOUND,
@@ -52,7 +52,7 @@ module.exports = {
 		return info;
 	},
 	updateUser: async function (id, updateDTO) {
-		const updateInfo = await models.user.findByPk(id);
+		const updateInfo = await models.account.findByPk(id);
 		if (!updateInfo) {
 			throw new AppError(
 				httpStatus.NOT_FOUND,
@@ -66,7 +66,7 @@ module.exports = {
 		return updateInfo;
 	},
 	active: async function (id) {
-		const actived = await models.user.findByPk(id);
+		const actived = await models.account.findByPk(id);
 		if (!actived) {
 			throw new AppError(
 				httpStatus.NOT_FOUND,
@@ -80,7 +80,7 @@ module.exports = {
 		return actived;
 	},
 	toggleLock: async function (id) {
-		const locked = await models.user.findByPk(id);
+		const locked = await models.account.findByPk(id);
 		if (!locked) {
 			throw new AppError(
 				httpStatus.NOT_FOUND,

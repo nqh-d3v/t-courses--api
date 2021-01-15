@@ -8,7 +8,7 @@ module.exports = {
         try {
             const DTO = await authSrv.validLocal(req.body);
             if (DTO) {
-                const jwt = issueJWT([DTO.user.id, DTO.user.username, DTO.user.role, Date.now()].join('@~@'));
+                const jwt = issueJWT([DTO.account.id, DTO.account.username, DTO.account.role, Date.now()].join('@~@'));
                 DTO.token = jwt.token;
                 DTO.exprires = jwt.expires;
             }
@@ -22,7 +22,7 @@ module.exports = {
         try {
             const DTO = await accountCtl.create(req.body);
             
-            const jwt = issueJWT([DTO.user.id, DTO.user.username, DTO.user.role, Date.now()].join('@~@'));
+            const jwt = issueJWT([DTO.id, DTO.username, DTO.role, Date.now()].join('@~@'));
             const info = {
                 account: {
                     id: DTO.id,

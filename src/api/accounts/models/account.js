@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable prettier/prettier */
 const { genPassword, validPassword } = require('../../../common/crypto/utils');
+const { Op } = require("sequelize");
 
 const AppError = require('../../../common/error/error');
 const { httpStatus } = require('../../../common/error/http-status');
@@ -92,7 +93,7 @@ module.exports = (sequelize, Sequelize) => {
 	Account.validateAccountCredentials = async function (credentials) {
 			const { username, password } = credentials;
 			const user = await Account.findOne({
-				where: { $or: [{ username }, { email: username }] }
+				where: { [Op.or]: [{ username }, { email: username }] }
 			});
 			if ( user && user.validPassword(password) ) {
 				return user

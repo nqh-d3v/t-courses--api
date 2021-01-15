@@ -7,8 +7,8 @@ router.use(auth.authenticateJWT);
 
 router.get('/', checkPermission(['admin']), accountCtl.getUsers);
 
-router.get('/me', checkPermission(['user']), accountCtl.getMyInfo);
-router.post('/me', checkPermission(['user']), accountCtl.updateMyInfo);
+router.get('/me', checkPermission(['*']), accountCtl.getMyInfo);
+router.post('/me', checkPermission(['*']), accountCtl.updateMyInfo);
 
 router.get('/search', checkPermission(['*']), accountCtl.findUsr);
 

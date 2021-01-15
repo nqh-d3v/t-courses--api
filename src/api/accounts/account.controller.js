@@ -1,9 +1,9 @@
-const userSrv = require('./account.service');
+const accountSrv = require('./account.service');
 
 module.exports = {
   getUser: async function (req, res, next) {
     try {
-      const info = await userSrv.getUserById(req.params.id);
+      const info = await accountSrv.getUserById(req.params.id);
 
       res.json(info);
     } catch (err) {
@@ -12,7 +12,7 @@ module.exports = {
   },
   findUsr: async function (req, res, next) {
     try {
-      const allDTO = await userSrv.findByQuery(req.query.s || '_', req.query.diff || '');
+      const allDTO = await accountSrv.findByQuery(req.query.s || '_', req.query.diff || '');
       res.json(allDTO);
     } catch (error) {
       next(error);
@@ -21,7 +21,7 @@ module.exports = {
   // for ADMIN only
   getUsers: async function (req, res, next) {
     try {
-      const all = await userSrv.getAllUser();
+      const all = await accountSrv.getAllUser();
 
       res.json(all);
     } catch (err) {
@@ -30,7 +30,7 @@ module.exports = {
   },
   toggleLock: async function (req, res, next) {
     try {
-      const status = await userSrv.toggleLock(req.params.id);
+      const status = await accountSrv.toggleLock(req.params.id);
       res.json(status);
     } catch (err) {
       next(err);
@@ -40,7 +40,7 @@ module.exports = {
   // for USER only
   getMyInfo: async function (req, res, next) {
     try {
-      const info = await userSrv.getUserById(req.user.id);
+      const info = await accountSrv.getUserById(req.user.id);
       res.json(info);
     } catch (err) {
       next(err);
@@ -48,7 +48,7 @@ module.exports = {
   },
   updateMyInfo: async function (req, res, next) {
     try {
-      const updated = await userSrv.updateUser(req.user.id, req.body);
+      const updated = await accountSrv.updateUser(req.user.id, req.body);
 
       res.json(updated);
     } catch (err) {

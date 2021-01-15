@@ -29,7 +29,7 @@ module.exports = (sequelize, Sequelize) => {
 
 	Token.associate = function (models) {
     Token.hasOne(models.account, {
-        foreignKey: 'user_id',
+        foreignKey: 'id',
         as: 'tokenauth_user',
         onDelete: 'CASCADE',
     });

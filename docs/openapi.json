@@ -21,33 +21,105 @@
   "tags": [
     {
       "name": "auth",
-      "description": "Huy - Authentication for account."
+      "description": "Authentication for account."
     },
     {
-      "name": "admin",
-      "description": "Thao Nhu - Everything about admin."
-    },
-    {
-      "name": "user",
-      "description": "Quynh Nhu - Everything about user."
-    },
-    {
-      "name": "post",
-      "description": "Khoi - Everything about posts and comments."
-    },
-    {
-      "name": "course",
-      "description": "Huy - Everything about courses, lessions and exercises."
+      "name": "account",
+      "description": "Everything about account."
     }
   ],
   "paths": {
-    "/auth": {
+    "/auth/local": {
+      "put": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Create a new local account (username and password).",
+        "operationId": "auth-local--create",
+        "requestBody": {
+          "description": "Username, password, name and your email.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "description": "A string (character, '.' and lowercase) with min(5) and max(50)",
+                    "type": "string"
+                  },
+                  "password": {
+                    "description": "A string with min(8)",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sucessed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "account": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "identify of admin's account"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "token": {
+                      "description": "Your token access",
+                      "type": "string"
+                    },
+                    "expires": {
+                      "description": "Time expired",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request - Not enough data from request.",
+            "content": {}
+          },
+          "409": {
+            "description": "Username ( or email ) already in use.",
+            "content": {}
+          },
+          "500": {
+            "description": "Bad request - Unknown error occurs when handle this request (Bug).",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
       "post": {
         "tags": [
           "auth"
         ],
-        "summary": "Login to your account using username and password.",
-        "operationId": "auth--local",
+        "summary": "Authenticate your local account (username and password).",
+        "operationId": "auth-local--valid",
         "requestBody": {
           "description": "Username and password need to be authenticated.",
           "content": {
@@ -75,7 +147,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "user": {
+                    "account": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -91,9 +163,11 @@
                       }
                     },
                     "token": {
+                      "description": "Your token access",
                       "type": "string"
                     },
                     "expires": {
+                      "description": "Time expired",
                       "type": "string"
                     }
                   }
@@ -106,11 +180,15 @@
             "content": {}
           },
           "401": {
-            "description": "Invalid credentials - Username or password is incorrect.",
+            "description": "Invalid credentials - Username ( or email ) or password is incorrect.",
             "content": {}
           },
-          "404": {
-            "description": "NOT FOUND - Account with username('{username}') was not found.",
+          "403": {
+            "description": "This account is locked.",
+            "content": {}
+          },
+          "405": {
+            "description": "This account is inactive. Check your email and active it.",
             "content": {}
           },
           "500": {
@@ -121,7 +199,7 @@
         "x-codegen-request-body-name": "body"
       }
     },
-    "/admin": {
+    "/account": {
       "get": {
         "tags": [
           "admin"
@@ -369,1326 +447,11 @@
         ],
         "x-codegen-request-body-name": "body"
       }
-    },
-    "/admin/{id}": {
-      "get": {
-        "tags": [
-          "admin"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "operationId": "admin-info--admin_id",
-        "responses": {
-          "200": {
-            "description": "Sucessed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "username": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Admin's account with id {id} was not found.",
-            "content": {}
-          },
-          "500": {
-            "description": "Internal Server Error - Unknown error occurs when authenticate.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "x-codegen-request-body-name": "body"
-      },
-      "delete": {
-        "tags": [
-          "admin"
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "operationId": "admin-delete--admin_id",
-        "responses": {
-          "200": {
-            "description": "Sucessed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "value": 1
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - You can't delete your account (or your permission is not admin).",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Admin's account with id('${id}') was not found to delete..",
-            "content": {}
-          },
-          "405": {
-            "description": "Method Not Allow - This admin's account can't be deleted.",
-            "content": {}
-          },
-          "500": {
-            "description": "Internal Server Error - Unknown errors occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
-        "x-codegen-request-body-name": "body"
-      }
-    },
-    "/user": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "description": "[admin] - All user's accounts in system will be returned.",
-        "operationId": "user-all",
-        "responses": {
-          "200": {
-            "description": "Successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "format": "int64"
-                      },
-                      "username": {
-                        "type": "string"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "avatar": {
-                        "type": "string",
-                        "description": "Link to avatar"
-                      },
-                      "isActive": {
-                        "type": "boolean",
-                        "description": "Is this account active?"
-                      },
-                      "isLock": {
-                        "type": "boolean",
-                        "description": "Is this account locking?"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Some errors occurs when authenticate.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "description": "[] - Add new user.",
-        "operationId": "user-new",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "description": "Username for authenitcate - Email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "Password for authenitcate"
-                  },
-                  "name": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "avatar": {
-                      "type": "string",
-                      "description": "Link to avatar"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Không đủ dữ liệu để xử lý.",
-            "content": {}
-          },
-          "409": {
-            "description": "Conflict - Tài khoản đã được sử dụng.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Một lỗi nào đó đã xảy, vui lòng thử lại sau hoặc liên hệ Quản trị viên để biết thông tin.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "patch": {
-        "tags": [
-          "user"
-        ],
-        "description": "[user] - Update my profile.",
-        "operationId": "user-update-myinfo",
-        "requestBody": {
-          "description": "Info to update user's profile.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "avatar": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "avatar": {
-                      "type": "string",
-                      "description": "Link to avatar"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request - Not Enough Data From Request.",
-            "content": {}
-          },
-          "401": {
-            "description": "Invalid credentials - User not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not user.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request (Make sure you have filled in the required information).",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/user/{id}": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "description": "[user] - Information of user's accounts will be returned.",
-        "operationId": "user-info--user_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of user's account",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "username": {
-                      "type": "string"
-                    },
-                    "avatar": {
-                      "type": "string",
-                      "description": "Link to avatar"
-                    },
-                    "isActive": {
-                      "type": "boolean",
-                      "description": "Is this account active?"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Acount with id('{id}') was not found.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "description": "[ADMIN] - Lock (or unlock) a  user's accounts.",
-        "operationId": "user-toggle-lock--user_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of admin's account",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "avatar": {
-                      "type": "string",
-                      "description": "Link to avatar"
-                    },
-                    "isActive": {
-                      "type": "boolean",
-                      "description": "This account is active (or locking)"
-                    },
-                    "isLock": {
-                      "type": "boolean",
-                      "description": "Is this account locking?"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Acount's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Acount with id('{id}') was not found.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "user"
-        ],
-        "description": "[admin] - Delete a user's accounts.",
-        "operationId": "user-delete--user_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of user's account",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "value": 1
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Acount with id('{id}') was not found to delete.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/post": {
-      "get": {
-        "tags": [
-          "post"
-        ],
-        "description": "[admin, user] - All posts will be returned with some condition.",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "sa",
-            "description": "Sort with author's name is ...",
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          },
-          {
-            "in": "query",
-            "name": "sb",
-            "description": "Sort by ... (up = DESC, down = ASC)",
-            "schema": {
-              "type": "string",
-              "enum": ["up", "down"],
-              "default": "down"
-            }
-          },
-          {
-            "in": "query",
-            "name": "sq",
-            "description": "Sort with content like ... ",
-            "schema": {
-              "type": "string",
-              "default": ""
-            }
-          },
-          {
-            "in": "query",
-            "name": "sw",
-            "description": "Sort with ...",
-            "schema": {
-              "type": "string",
-              "enum": ["time", "likes", "comments"],
-              "default": "time"
-            }
-          }
-        ],
-        "operationId": "post-all",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "identify of post"
-                      },
-                      "author": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer",
-                            "format": "int64",
-                            "description": "identify of post"
-                          },
-                          "avatar": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "content": {
-                        "type": "string",
-                        "description": "Texteditor is Markdown (example is .md file type)"
-                      },
-                      "isReactioned": {
-                        "description": "Return a type of reaction if reactioned | null = no reaction"
-                      },
-                      "nLikes": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Number of reactions of post"
-                      },
-                      "nComments": {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "Number of comments of post"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid Credentials - Account not logged in.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Some errors occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "post"
-        ],
-        "description": "[user] - Add new post",
-        "operationId": "post-new",
-        "requestBody": {
-          "description": "Post content need to be added.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "content": {
-                    "type": "string",
-                    "default": ""
-                  },
-                  "tags": {
-                    "type": "string",
-                    "default": ""
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/post"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not user.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/post/{id}": {
-      "get": {
-        "tags": [
-          "post"
-        ],
-        "description": "[admin, user] - Information of post with id({id}) will be returned. If USER, return post actived only",
-        "operationId": "post-info--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/post"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid Credentials - Account not logged in.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Post not exist or not active.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "post"
-        ],
-        "description": "[admin] - Change status for post (active or inactive)",
-        "operationId": "post-toggle-status--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Change status successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "isActive": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - No post with id('{id}') was found to update.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "patch": {
-        "tags": [
-          "post"
-        ],
-        "description": "[user] - Update an user's post",
-        "operationId": "post-update--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "groupName": {
-                    "type": "string",
-                    "description": "Group name of post."
-                  },
-                  "postContent": {
-                    "type": "string",
-                    "description": "Content of post."
-                  },
-                  "postType": {
-                    "type": "string",
-                    "description": "Type of post."
-                  },
-                  "postVideo": {
-                    "type": "string",
-                    "description": "Link to video of post."
-                  },
-                  "linkToManagerSocial": {
-                    "type": "string",
-                    "description": "Link to facebook account's manager of group."
-                  },
-                  "isTeam": {
-                    "type": "boolean",
-                    "description": "Type of post's author."
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Delete post successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "value": 1
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - No post with id('{id}') was found to update.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request (Make sure you have filled in the required information).",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "post"
-        ],
-        "description": "[admin] - Delete post",
-        "operationId": "post-delete--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Delete post successed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "value": 1
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - No post with id('{id}') was found to delete.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/post/{id}/comment": {
-      "get": {
-        "tags": [
-          "post"
-        ],
-        "description": "[admin, user] - List of comment for a post.",
-        "operationId": "post-comment--list-comments",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "Identify(id) of commenter"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "Name of commenter"
-                      },
-                      "content": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid Credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not user.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Post with id('{id}') was not found.",
-            "content": {}
-          },
-          "500": {
-            "description": "Internal Server Error - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "post"
-        ],
-        "description": "[user] - Comment for a post.",
-        "operationId": "post-comment--new",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/comment"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid Credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not user.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Post with id('{id}') was not found.",
-            "content": {}
-          },
-          "500": {
-            "description": "Internal Server Error - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "patch": {
-        "tags": [
-          "post"
-        ],
-        "description": "[user] - Update user's comment.",
-        "operationId": "post-comment-update--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "id",
-            "required": true,
-            "description": "Identify of comment",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/comment"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - No post or comment with id('{id}') was found to update.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request (Make sure you have filled in the required information).",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "post"
-        ],
-        "description": "[user] - Delete your comment.",
-        "operationId": "post-comment-delete--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return to '1' = If successed",
-            "content": {}
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - It is not your comment.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - No post or comment with id('{id}') was found to delete.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request (Make sure you have filled in the required information).",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/post/{id}/reaction": {
-      "get": {
-        "tags": [
-          "post"
-        ],
-        "description": "[user] - Reaction for a post.",
-        "operationId": "post-reaction",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "t",
-            "required": true,
-            "description": "Type of reaction",
-            "schema": {
-              "type": "string",
-              "enum": ["like", "heart"],
-              "default": "like"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/reaction"
-                }
-              }
-            }
-          },
-          "205": {
-            "description": "Success - Undo reaction (Remove old reaction)",
-            "content": {}
-          },
-          "401": {
-            "description": "Invalid Credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not user.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - Post with id('{id}') was not found.",
-            "content": {}
-          },
-          "500": {
-            "description": "Internal Server Error - Unknown error occurs when handle this request.",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "post"
-        ],
-        "description": "[admin, user] - Get list of reacter for post.",
-        "operationId": "post-reaction-info--post_id",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "description": "Identify(id) of post",
-            "schema": {
-              "type": "integer",
-              "min": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "t",
-            "description": "Type of reation",
-            "schema": {
-              "type": "string",
-              "enum": ["like"],
-              "default": "like"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "description": "Identify(id) of reacter"
-                      },
-                      "name": {
-                        "type": "string",
-                        "description": "Name of reacter"
-                      },
-                      "type": {
-                        "type": "string",
-                        "enum": ["like"],
-                        "default": "like"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials - Account not logged in.",
-            "content": {}
-          },
-          "403": {
-            "description": "Forbidden - Account's permission is not admin.",
-            "content": {}
-          },
-          "404": {
-            "description": "NOT FOUND - No post with id('{id}') was found to update.",
-            "content": {}
-          },
-          "500": {
-            "description": "Bad request - Unknown error occurs when handle this request (Make sure you have filled in the required information).",
-            "content": {}
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
     }
   },
   "components": {
     "schemas": {
-      "user": {
+      "account": {
         "type": "object",
         "properties": {
           "id": {
@@ -1731,127 +494,6 @@
           "updatedAt": {
             "type": "string",
             "description": "The last time, this account was updated at ..."
-          }
-        }
-      },
-      "admin": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "username": {
-            "type": "string",
-            "description": "Username to authenticate."
-          },
-          "password": {
-            "type": "string",
-            "description": "Password to authenticate."
-          },
-          "role": {
-            "type": "string",
-            "value": "admin",
-            "description": "This account's permission is admin."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "This account was created at ..."
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The last time, this account was updated at ..."
-          }
-        }
-      },
-      "post": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "author": {
-            "type": "string",
-            "description": "identify of author."
-          },
-          "content": {
-            "type": "string",
-            "description": "Content of post."
-          },
-          "isActive": {
-            "type": "boolean",
-            "description": "Was it actived by admin."
-          },
-          "isCommentLock": {
-            "type": "boolean",
-            "description": "Was its comment locked by admin."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "This post was created at ..."
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The last time, this post was updated at ..."
-          }
-        }
-      },
-      "reaction": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "userId": {
-            "type": "string",
-            "description": "Identify(id) of voter."
-          },
-          "postId": {
-            "type": "string",
-            "description": "Identify(id) of post."
-          },
-          "type": {
-            "type": "string",
-            "enum": ["like"]
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "This post was created at ..."
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The last time, this post was updated at ..."
-          }
-        }
-      },
-      "comment": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "userId": {
-            "type": "string",
-            "description": "Identify(id) of commenter."
-          },
-          "postId": {
-            "type": "string",
-            "description": "Identify(id) of post."
-          },
-          "content": {
-            "type": "string",
-            "description": "Content of comment."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Comment at ..."
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "The same of createdAt"
           }
         }
       }
