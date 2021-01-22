@@ -14,20 +14,20 @@ module.exports = {
 		if (check) {
 			throw new AppError(
 				httpStatus.CONFLICT,
-				'Username or email already used',
+				'Accountname or email already used',
 				true,
 			);
 		}
-		const newUser = await models.account.create({ username, password, name, email });
+		const newAccount = await models.account.create({ username, password, name, email });
 
-		delete newUser.dataValues.password;
-		return newUser;
+		delete newAccount.dataValues.password;
+		return newAccount;
 	},
-	getAllUser: async function () {
+	getAllAccount: async function () {
 		const all = await models.account.findAll();
 		return all;
 	},
-	getUserById: async function (id) {
+	getAccountById: async function (id) {
 		const info = await models.account.findOne({where: { id, isLock: false }});
 		if (!info) {
 			throw new AppError(
@@ -39,19 +39,7 @@ module.exports = {
 		delete info.dataValues.password;
 		return info;
 	},
-	getUserByUsername: async function (username) {
-		const info = await models.account.findOne({where: { username, isLock: false }});
-		if (!info) {
-			throw new AppError(
-				httpStatus.NOT_FOUND,
-				'Tài khoản không tồn tại',
-				true,
-			);
-		}
-		delete info.dataValues.password;
-		return info;
-	},
-	updateUser: async function (id, updateDTO) {
+	updateAccount: async function (id, updateDTO) {
 		const updateInfo = await models.account.findByPk(id);
 		if (!updateInfo) {
 			throw new AppError(
@@ -74,6 +62,20 @@ module.exports = {
 				true,
 			);
 		}
+		if (actived.isActive) {
+			throw new AppError(
+				httpStatus.FORBIDDEN,
+				'Tài khoản đã kích hoạt trước đó',
+				true,
+			);
+		}
+		if (actived.isLock) {
+			throw new AppError(
+				httpStatus.METHOD_NOT_ALLOWED,
+				'Tài khoản đã bị khóa',
+				true,
+			);
+		}
 		actived.isActive = true;
 		await actived.save();
 		delete actived.dataValues.password;
@@ -93,14 +95,4 @@ module.exports = {
 		delete locked.dataValues.password;
 		return locked;
 	},
-
-	// -------------- SUPPORT -----------------
-	findByQuery: async function (s, d = '') {
-		const listId = d.includes('_') ? d.trim().split('_').join(', ') : `${ d.trim().length > 0 ? d : '' }`;
-		const sqlCmd = `SELECT users.id, users.name FROM users WHERE (users.name LIKE '%${s}%' OR users.username LIKE '%${s}%') ${listId !== '' ? `AND users.id NOT IN (${listId})` : ''}`;
-		const resultCmd = await models.sequelize.query(sqlCmd, {
-				type: models.sequelize.QueryTypes.SELECT,
-		});
-		return resultCmd;
-	}
 };
